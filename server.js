@@ -56,9 +56,13 @@ app.post('/api/book', function(req, res){
         });
 
     console.log(cabanaBookings);
-    
+
     res.send('Cabana booked successfully!');
 })
+
+app.get('/api/cabana-bookings', function(req, res){
+    res.json(cabanaBookings);
+});
 
 app.listen(PORT, function(){
     console.log(`Server running at http://localhost:${PORT}`);
