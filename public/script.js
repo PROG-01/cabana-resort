@@ -8,11 +8,15 @@ const tileClasses = {
     "p": "pool"
 };
 
-fetch("/api/map")
-    .then(function(response){
+Promise.all([
+    fetch("/api/map").then(function(response){
+        return response.json();
+    }),
+    fetch("/api/cabana-bookings").then(function(response){
         return response.json();
     })
-    .then(function(mapData){
+])
+.then(function([mapData, cabanaBookings]){
 
         mapData.forEach(function(row, rowIndex){
 
@@ -26,6 +30,14 @@ fetch("/api/map")
                 cellDiv.classList.add("cell");
                 if(cell === "W"){
                     cellDiv.style.cursor = "pointer";
+
+                    const booking = cabanaBookings.find(function(cabana){
+                         return cabana.row === rowIndex && cabana.col === colIndex;
+                    });
+
+                    if(booking){
+                         cellDiv.classList.add("booked")
+                    }
 
                     cellDiv.addEventListener("click", function(){
                          const room = prompt("Enter room number:");
@@ -59,6 +71,13 @@ fetch("/api/map")
                         })
                         .then(function(message){
                              alert(message);
+
+                             if(message === "Cabana booked successfully!"){
+                              cellDiv.classList.add("booked");
+
+                             cellDiv.style.pointerEvents = "none";
+                             }
+                             
                         });
                     })
 

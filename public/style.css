@@ -37,3 +37,8 @@ body{
 .pool{
     background-color:#26c6da;
 }
+
+.booked{
+    opacity: 0.4;
+    border: 2px solid red;
+}
