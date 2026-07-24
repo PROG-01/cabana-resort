@@ -42,3 +42,38 @@ body{
     opacity: 0.4;
     border: 2px solid red;
 }
+
+.hidden.hidden {
+    display: none;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.5);
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+}
+
+.modal-content {
+
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 8px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    min-width: 300px;
+
+}

@@ -67,15 +67,21 @@ Promise.all([
                              })
                         })
                         .then(function(response){
-                             return response.text();
+                             return response.text().then(function(message){
+                              return {
+                                   ok: response.ok,
+                                   message: message
+                              };
+
+                             });
                         })
-                        .then(function(message){
-                             alert(message);
+                        .then(function(result){
+                             alert(result.message);
 
-                             if(message === "Cabana booked successfully!"){
+                             if(result.ok){
+
                               cellDiv.classList.add("booked");
-
-                             cellDiv.style.pointerEvents = "none";
+                              cellDiv.style.pointerEvents = "none";
                              }
                              
                         });
