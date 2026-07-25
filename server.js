@@ -12,15 +12,13 @@ const mapData = fs.readFileSync('data/map.ascii', 'utf8').trim().split('\n');
 
 const cabanaBookings = [];
 
-console.log(bookings);
-
 const PORT = 3000;
 
 // Middleware 
 app.use(express.static('public'));
 app.use(express.json());
 
-// routes
+// Routes
 app.get('/api/map', function(req, res){
     res.json(mapData);
 });
@@ -29,14 +27,18 @@ app.get("/api/bookings", function(req, res){
     res.json(bookings);
 });
 
+app.get('/api/cabana-bookings', function(req, res){
+    res.json(cabanaBookings);
+});
+
 app.post('/api/book', function(req, res){
-    const { row, col, room, guestName} = req.body;
+    const { row, col, room, guestName } = req.body;
 
     const guest = bookings.find(function(booking){
         return booking.room === room && booking.guestName === guestName;
     });
 
-    if (!guest){
+    if (!guest) {
         return res.status(400).send('Invalid room number or guest name');
     };
 
@@ -44,24 +46,18 @@ app.post('/api/book', function(req, res){
         return booking.row === row && booking.col === col;
     });
 
-    if(existingBooking){
+    if (existingBooking) {
         return res.status(400).send('This cabana is already booked');
     }
 
-        cabanaBookings.push({
-            row,
-            col,
-            room,
-            guestName
-        });
-
-    console.log(cabanaBookings);
+    cabanaBookings.push({
+        row,
+        col,
+        room,
+        guestName
+    });
 
     res.send('Cabana booked successfully!');
-})
-
-app.get('/api/cabana-bookings', function(req, res){
-    res.json(cabanaBookings);
 });
 
 app.listen(PORT, function(){

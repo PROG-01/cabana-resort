@@ -77,7 +77,8 @@ Promise.all([
                     });
 
                     if(booking){
-                         cellDiv.classList.add("booked")
+                         cellDiv.classList.add("booked");
+                         cellDiv.style.pointerEvents = "none";
                     }
 
                     cellDiv.addEventListener("click", function(){
