@@ -77,3 +77,39 @@ body{
     min-width: 300px;
 
 }
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+
+    padding: 15px 20px;
+
+    border-radius: 8px;
+
+    color: white;
+
+    font-weight: bold;
+
+    opacity: 0;
+
+    transition: opacity 0.3s ease;
+
+    pointer-events: none;
+}
+
+.notification.success {
+    background-color: #2e7d32;
+}
+
+.notification.error {
+    background-color: #c62828;
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+.hidden {
+    display: none;
+}

@@ -1,5 +1,46 @@
 const mapContainer = document.querySelector("#map");
 
+const bookingModal = document.querySelector("#bookingModal");
+const roomInput = document.querySelector("#roomInput");
+const guestInput = document.querySelector("#guestInput");
+
+const bookBtn = document.querySelector("#bookBtn");
+const cancelBtn = document.querySelector("#cancelBtn");
+
+const notification = document.querySelector("#notification");
+
+let selectedCabana = null;
+
+function showNotification(message, isSuccess) {
+
+    notification.textContent = message;
+
+    notification.classList.remove("hidden");
+    notification.classList.remove("success");
+    notification.classList.remove("error");
+
+    if (isSuccess) {
+        notification.classList.add("success");
+    } else {
+        notification.classList.add("error");
+    }
+
+    notification.classList.add("show");
+
+    setTimeout(function () {
+
+        notification.classList.remove("show");
+
+        setTimeout(function () {
+
+            notification.classList.add("hidden");
+
+        }, 300);
+
+    }, 2500);
+
+}
+
 const tileClasses = {
     ".": "grass",
     "#": "road",
@@ -40,51 +81,18 @@ Promise.all([
                     }
 
                     cellDiv.addEventListener("click", function(){
-                         const room = prompt("Enter room number:");
-
-                         if(!room){
-                              return;
-                         }
-
-                         const guestName = prompt("Enter guest name:");
-
-                         if(!guestName){
-                              return;
-                         }
-
-                         fetch("/api/book", {
-                             method: "POST",
-
-                             headers: {
-                             "Content-Type": "application/json"
-                             },
-
-                             body: JSON.stringify({
+                         selectedCabana = {
                              row: rowIndex,
                              col: colIndex,
-                             room,
-                             guestName
-                             })
-                        })
-                        .then(function(response){
-                             return response.text().then(function(message){
-                              return {
-                                   ok: response.ok,
-                                   message: message
-                              };
+                             cell: cellDiv
+                         };
 
-                             });
-                        })
-                        .then(function(result){
-                             alert(result.message);
+                         roomInput.value = "";
+                         guestInput.value = "";
 
-                             if(result.ok){
+                         bookingModal.classList.remove("hidden");
 
-                              cellDiv.classList.add("booked");
-                              cellDiv.style.pointerEvents = "none";
-                             }
-                             
-                        });
+                         roomInput.focus();
                     })
 
                 }
@@ -100,3 +108,74 @@ Promise.all([
         });
 
     });
+
+    cancelBtn.addEventListener("click", function () {
+
+    bookingModal.classList.add("hidden");
+
+    roomInput.value = "";
+    guestInput.value = "";
+
+    selectedCabana = null;
+
+});
+
+bookBtn.addEventListener("click", function () {
+
+    const room = roomInput.value.trim();
+    const guestName = guestInput.value.trim();
+
+    if (!room || !guestName) {
+        showNotification("Please fill in both fields.", false);
+        return;
+    }
+
+    fetch("/api/book", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+            row: selectedCabana.row,
+            col: selectedCabana.col,
+            room,
+            guestName
+
+        })
+
+    })
+    .then(function(response){
+
+        return response.text().then(function(message){
+
+            return {
+                ok: response.ok,
+                message: message
+            };
+
+        });
+
+    })
+    .then(function(result){
+
+        showNotification(result.message, result.ok);
+
+        if(result.ok){
+
+            selectedCabana.cell.classList.add("booked");
+
+            selectedCabana.cell.style.pointerEvents = "none";
+
+            bookingModal.classList.add("hidden");
+
+            selectedCabana = null;
+
+        }
+
+    });
+
+});
