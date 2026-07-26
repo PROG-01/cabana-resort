@@ -4,7 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "jest",
+    "test:e2e": "playwright test"
   },
   "keywords": [],
   "author": "",
@@ -12,5 +14,10 @@
   "type": "commonjs",
   "dependencies": {
     "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.0",
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2"
   }
 }
