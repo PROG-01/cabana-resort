@@ -2,17 +2,16 @@ const fs = require('fs');
 
 const express = require('express');
 
-const app = express();
+function createApp(mapPath, bookingsPath) {
+    const app = express();
 
-const bookings = JSON.parse(
-    fs.readFileSync("data/bookings.json", "utf8")
+    const bookings = JSON.parse(
+    fs.readFileSync(bookingsPath, "utf8")
 );
 
-const mapData = fs.readFileSync('data/map.ascii', 'utf8').trim().split('\n');
+const mapData = fs.readFileSync(mapPath, 'utf8').trim().split('\n');
 
 const cabanaBookings = [];
-
-const PORT = 3000;
 
 // Middleware 
 app.use(express.static('public'));
@@ -71,4 +70,7 @@ app.post("/api/reset", function (req, res) {
 
 });
 
-module.exports = app;
+return app;
+}
+
+module.exports = createApp;

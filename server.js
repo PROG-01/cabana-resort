@@ -1,4 +1,9 @@
-const app = require("./app");
+const createApp = require("./app");
+
+const app = createApp(
+    'data/map.ascii',
+    'data/bookings.json'
+);
 
 const PORT = 3000;
 
