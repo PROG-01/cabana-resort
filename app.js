@@ -22,10 +22,6 @@ app.get('/api/map', function(req, res){
     res.json(mapData);
 });
 
-app.get("/api/bookings", function(req, res){
-    res.json(bookings);
-});
-
 app.get('/api/cabana-bookings', function(req, res){
     res.json(cabanaBookings);
 });
