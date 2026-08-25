@@ -19,5 +19,10 @@
     "@playwright/test": "^1.62.0",
     "jest": "^30.4.2",
     "supertest": "^7.2.2"
+  },
+  "jest": {
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.js"
+    ]
   }
 }

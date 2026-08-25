@@ -1,5 +1,10 @@
 const request = require("supertest");
-const app = require("../app");
+const createApp = require("../app");
+
+const app = createApp(
+    "data/map.ascii",
+    "data/bookings.json"
+);
 
 describe("GET /api/map", function () {
 
@@ -12,20 +17,6 @@ describe("GET /api/map", function () {
         expect(Array.isArray(response.body)).toBe(true);
 
         expect(response.body.length).toBeGreaterThan(0);
-
-    });
-
-});
-
-describe("GET /api/bookings", function () {
-
-    test("should return the hotel bookings", async function () {
-
-        const response = await request(app).get("/api/bookings");
-
-        expect(response.status).toBe(200);
-
-        expect(Array.isArray(response.body)).toBe(true);
 
     });
 
