@@ -22,8 +22,14 @@ app.get('/api/map', function(req, res){
     res.json(mapData);
 });
 
-app.get('/api/cabana-bookings', function(req, res){
-    res.json(cabanaBookings);
+app.get('/api/cabana-bookings', function(req, res) {
+    const bookedCoordinates = cabanaBookings.map(function(booking) {
+        return {
+            row: booking.row,
+            col: booking.col
+        };
+    });
+    res.json(bookedCoordinates);
 });
 
 app.post('/api/book', function(req, res){
@@ -35,6 +41,10 @@ app.post('/api/book', function(req, res){
 
     if (!guest) {
         return res.status(400).send('Invalid room number or guest name');
+    };
+
+    if (!mapData[row] || mapData[row][col] !== "W") {
+        return res.status(400).send("Invalid cabana location");
     };
 
     const existingBooking = cabanaBookings.find(function(booking){

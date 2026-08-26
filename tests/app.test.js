@@ -29,8 +29,8 @@ describe("POST /api/book", function () {
         const response = await request(app)
             .post("/api/book")
             .send({
-                row: 10,
-                col: 10,
+                row: 11,
+                col: 11,
                 room: "101",
                 guestName: "Alice Smith"
             });
@@ -58,13 +58,27 @@ describe("POST /api/book", function () {
 
 });
 
+test("should reject booking a non-cabana location", async function () {
+    const response = await request(app)
+        .post("/api/book")
+        .send({
+            row: 0,
+            col: 0,
+            room: "101",
+            guestName: "Alice Smith"
+        });
+
+    expect(response.status).toBe(400);    
+
+});
+
 test("should reject booking an already booked cabana", async function () {
 
     const response = await request(app)
         .post("/api/book")
         .send({
-            row: 10,
-            col: 10,
+            row: 11,
+            col: 11,
             room: "101",
             guestName: "Alice Smith"
         });
@@ -73,6 +87,20 @@ test("should reject booking an already booked cabana", async function () {
 
     expect(response.text).toBe("This cabana is already booked");
 
+});
+
+test("should expose only booked cabana coordinates", async function () {
+    const response = await request(app)
+        .get("/api/cabana-bookings");
+
+    expect(response.status).toBe(200);
+
+    response.body.forEach(function(booking) {
+        expect(booking).toHaveProperty("row");
+        expect(booking).toHaveProperty("col");
+        expect(booking).not.toHaveProperty("room");
+        expect(booking).not.toHaveProperty("guestName");
+    });
 });
 
 });
