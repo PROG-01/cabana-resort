@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "jest",
-    "test:e2e": "playwright test"
+    "test": "NODE_ENV=test jest",
+    "test:e2e": "NODE_ENV=test playwright test"
   },
   "keywords": [],
   "author": "",

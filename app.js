@@ -68,13 +68,14 @@ app.post('/api/book', function(req, res){
 
 // Test-only route used by Playwright to reset
 // in-memory cabana bookings between tests.
-app.post("/api/reset", function (req, res) {
 
-    cabanaBookings.length = 0;
-
-    res.sendStatus(200);
-
-});
+if (process.env.NODE_ENV === 'test') {
+    app.post("/api/reset", function (req, res) {
+        cabanaBookings.length = 0;
+        res.sendStatus(200);
+    });
+    
+}
 
 return app;
 }

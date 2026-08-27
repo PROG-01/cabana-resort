@@ -58,18 +58,18 @@ describe("POST /api/book", function () {
 
 });
 
-test("should reject booking a non-cabana location", async function () {
+test("should reject booking a non-cabana location", async function() {
     const response = await request(app)
-        .post("/api/book")
-        .send({
-            row: 0,
-            col: 0,
-            room: "101",
-            guestName: "Alice Smith"
-        });
+    .post("/api/book")
+    .send({
+        row: 0,
+        col: 0,
+        room: "101",
+        guestName: "Alice Smith"
+    });
 
-    expect(response.status).toBe(400);    
-
+    expect(response.status).toBe(400);
+    expect (response.text).toBe("Invalid cabana location");
 });
 
 test("should reject booking an already booked cabana", async function () {

@@ -11,6 +11,18 @@ if (mapIndex === -1 || bookingsIndex === -1) {
 const mapPath = process.argv[mapIndex + 1];
 const bookingsPath = process.argv[bookingsIndex + 1];
 
+if (
+    !mapPath ||
+    !bookingsPath ||
+    mapPath.startsWith("--") ||
+    bookingsPath.startsWith("--")
+) {
+    console.error(
+        "Usage: node server.js --map <map-file> --bookings <bookings-file>"
+    );
+    process.exit(1);
+}
+
 const app = createApp(mapPath, bookingsPath);
 
 const PORT = 3000;
