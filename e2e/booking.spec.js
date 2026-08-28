@@ -2,7 +2,9 @@ const { test, expect } = require("@playwright/test");
 
 test.beforeEach(async ({ request }) => {
 
-    await request.post("/api/reset");
+    const response = await request.post("/api/reset");
+
+    expect(response.ok()).toBeTruthy();
 
 });
 
@@ -57,5 +59,27 @@ test("invalid guest shows an error notification", async ({ page }) => {
 
     await expect(page.locator("#notification"))
         .toContainText("Invalid room number or guest name");
+
+});
+
+test("booked cabana remains booked after page refresh", async ({ page }) => {
+
+    await page.goto("/");
+
+    const cabana = page.locator(".water").first();
+
+    await cabana.click();
+
+    await page.fill("#roomInput", "101");
+    await page.fill("#guestInput", "Alice Smith");
+    await page.click("#bookBtn");
+
+    await expect(page.locator("#notification"))
+        .toContainText("Cabana booked successfully!");
+
+    await page.reload();
+
+    await expect(page.locator(".water").first())
+        .toHaveClass(/booked/);
 
 });

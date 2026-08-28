@@ -108,7 +108,13 @@ Promise.all([
 
         });
 
-    });
+    })
+    .catch(function(){
+        showNotification(
+            "Unable to load the resort map.",
+            false
+        );
+    })
 
     cancelBtn.addEventListener("click", function () {
 
@@ -168,7 +174,6 @@ bookBtn.addEventListener("click", function () {
         if(result.ok){
 
             selectedCabana.cell.classList.add("booked");
-
             selectedCabana.cell.style.pointerEvents = "none";
 
             bookingModal.classList.add("hidden");
@@ -177,6 +182,12 @@ bookBtn.addEventListener("click", function () {
 
         }
 
+    })
+    .catch(function() {
+        showNotification(
+            "Something went wrong. Please try again.",
+            false
+        );
     });
 
 });

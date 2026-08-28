@@ -1,25 +1,25 @@
 # Cabana Resort Booking System
 
-A simple full-stack booking application built with Node.js, Express, HTML, CSS, and JavaScript.
+A simple full-stack booking application built with Node.js, Express, HTML, CSS, and vanilla JavaScript.
 
-The application allows hotel guests to reserve pool cabanas after validating their hotel booking.
-
----
+The application allows hotel guests to reserve available pool cabanas after validating their room number and guest name against existing hotel bookings.
 
 ## Features
 
-- Display resort map from an ASCII map file
-- Render the resort map in the browser
-- Select available cabanas
-- Validate hotel room number and guest name
-- Prevent double booking
-- Visual indication of booked cabanas
-- Booking modal interface
-- Success and error notifications
+- Loads a resort map from an ASCII file
+- Dynamically renders the resort map in the browser
+- Allows guests to select available cabanas
+- Validates room number and guest name on the server
+- Validates cabana coordinates on the server
+- Prevents double booking
+- Displays booked cabanas visually
+- Preserves booking state across browser refreshes while the server is running
+- Resets bookings when the server restarts
+- Uses a booking modal instead of browser prompts
+- Displays success and error notifications
+- Protects guest information from public API responses
 - Automated backend API tests
-- Automated frontend UI tests
-
----
+- Automated frontend end-to-end tests
 
 ## Tech Stack
 
@@ -40,11 +40,9 @@ The application allows hotel guests to reserve pool cabanas after validating the
 - Supertest
 - Playwright
 
----
-
 ## Project Structure
 
-```
+```text
 cabana-resort/
 │
 ├── data/
@@ -64,114 +62,173 @@ cabana-resort/
 │
 ├── app.js
 ├── server.js
+├── playwright.config.js
 ├── package.json
 └── README.md
 ```
 
----
-
 ## Installation
 
-Install dependencies:
+Install the dependencies:
 
 ```bash
 npm install
 ```
 
-Start the application:
+## Running the Application
+
+The application requires paths to the resort map and hotel bookings files.
+
+Run:
 
 ```bash
-npm start
+node server.js --map data/map.ascii --bookings data/bookings.json
 ```
 
-Open:
+Alternatively, using npm:
 
+```bash
+npm start -- --map data/map.ascii --bookings data/bookings.json
 ```
+
+Then open:
+
+```text
 http://localhost:3000
 ```
 
----
+If the required command-line arguments are missing, the application displays the expected usage:
 
-## Running Tests
+```text
+Usage: node server.js --map <map-file> --bookings <bookings-file>
+```
+
+## API Endpoints
+
+### GET `/api/map`
+
+Returns the resort map as an array of rows.
+
+### GET `/api/cabana-bookings`
+
+Returns only the coordinates of currently booked cabanas.
+
+Example:
+
+```json
+[
+    {
+        "row": 11,
+        "col": 11
+    }
+]
+```
+
+Room numbers and guest names are intentionally not returned by this endpoint.
+
+### POST `/api/book`
+
+Attempts to reserve a cabana.
+
+The request contains:
+
+```json
+{
+    "row": 11,
+    "col": 11,
+    "room": "101",
+    "guestName": "Alice Smith"
+}
+```
+
+The server verifies that:
+
+- the room number and guest name correspond to an existing hotel booking
+- the supplied coordinates represent a cabana on the resort map
+- the cabana has not already been booked
+
+The server returns an appropriate success or error response.
+
+### POST `/api/reset`
+
+This endpoint exists **only in the test environment**.
+
+It is used by automated tests to reset the in-memory cabana booking state between tests.
+
+It is not registered when the application runs normally.
+
+## Testing
 
 ### Backend API Tests
+
+Run:
 
 ```bash
 npm test
 ```
 
-### Frontend UI Tests
+The backend test suite covers key behavior including:
+
+- loading the resort map
+- successful cabana booking
+- invalid guest validation
+- rejection of non-cabana coordinates
+- prevention of duplicate bookings
+- ensuring the public cabana-bookings endpoint does not expose room numbers or guest names
+
+### Frontend End-to-End Tests
+
+Run:
 
 ```bash
 npm run test:e2e
 ```
 
----
+The Playwright tests cover:
 
-## API Endpoints
+- loading the application
+- opening the booking modal
+- successfully booking a cabana
+- displaying an error for invalid guest details
+- retaining the booked visual state after a page refresh
 
-### GET
+## Data and Privacy
 
-```
-GET /api/map
-```
+Hotel booking information is loaded from the bookings file supplied through the `--bookings` command-line option.
 
-Returns the ASCII resort map.
+The hotel guest list remains private to the backend and is used only to validate booking requests. It is not published through a public API endpoint.
 
----
+The frontend receives only the row and column coordinates required to identify already-booked cabanas.
 
-```
-GET /api/bookings
-```
+## Booking Storage
 
-Returns hotel booking data.
+Cabana bookings are intentionally stored in memory.
 
----
+This follows the scope of the assignment, which does not require persistent storage.
 
-```
-GET /api/cabana-bookings
-```
+As a result:
 
-Returns booked cabanas.
-
----
-
-### POST
-
-```
-POST /api/book
-```
-
-Books a cabana after validating:
-
-- room number
-- guest name
-
-Returns:
-
-- success
-- invalid guest
-- already booked
-
----
-
-```
-POST /api/reset
-```
-
-Used only during automated Playwright tests to reset the in-memory cabana booking state between tests.
-
----
+- bookings remain available while the server is running
+- refreshing the browser does not clear bookings
+- restarting the server clears all cabana bookings
 
 ## Assumptions
 
-- Hotel bookings are loaded from `bookings.json`.
-- Cabana bookings are stored in memory.
-- Restarting the server clears cabana bookings.
-- The resort map is loaded from `map.ascii`.
+- `W` in the ASCII map represents a bookable cabana.
+- Hotel guests are validated using the supplied room number and guest name.
+- Only one booking may exist for a cabana at a time.
+- Persistent cabana-booking storage is outside the required scope.
 
----
+## Design Notes
 
-## Notes
+The project intentionally uses a small architecture appropriate to the scope of the assignment.
 
-This project intentionally keeps the architecture simple to match the scope of the assignment while focusing on readability, maintainability, and automated testing. Developed as part of a Junior Software Engineer technical assessment.
+`server.js` handles command-line configuration and starts the server.
+
+`app.js` creates the Express application, loads the supplied data files, performs backend validation, and manages in-memory cabana bookings.
+
+The browser handles map rendering and user interaction, while security-sensitive validation remains on the server.
+
+Automated tests cover both API behavior and key browser workflows.
+
+Developed as part of a Junior Software Engineer technical assessment.

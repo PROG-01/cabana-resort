@@ -24,6 +24,10 @@ describe("GET /api/map", function () {
 
 describe("POST /api/book", function () {
 
+    beforeEach(async function(){
+        await request(app).post("/api/reset");
+    });
+
     test("should successfully book a cabana", async function () {
 
         const response = await request(app)
@@ -74,7 +78,7 @@ test("should reject booking a non-cabana location", async function() {
 
 test("should reject booking an already booked cabana", async function () {
 
-    const response = await request(app)
+    await request(app)
         .post("/api/book")
         .send({
             row: 11,
@@ -83,6 +87,15 @@ test("should reject booking an already booked cabana", async function () {
             guestName: "Alice Smith"
         });
 
+    const response = await request(app)
+        .post("/api/book")
+        .send({
+            row: 11,
+            col: 11,
+            room: "101",
+            guestName: "Alice Smith"
+        });    
+
     expect(response.status).toBe(400);
 
     expect(response.text).toBe("This cabana is already booked");
@@ -90,17 +103,31 @@ test("should reject booking an already booked cabana", async function () {
 });
 
 test("should expose only booked cabana coordinates", async function () {
-    const response = await request(app)
-        .get("/api/cabana-bookings");
+
+    const bookingResponse = await request(app)
+        .post("/api/book")
+        .send({
+            row: 11,
+            col: 11,
+            room: "101",
+            guestName: "Alice Smith"
+        });
+
+    expect(bookingResponse.status).toBe(200);    
+
+    const response = await request(app)    
+        .get("/api/cabana-bookings");    
 
     expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(1);
 
-    response.body.forEach(function(booking) {
-        expect(booking).toHaveProperty("row");
-        expect(booking).toHaveProperty("col");
-        expect(booking).not.toHaveProperty("room");
-        expect(booking).not.toHaveProperty("guestName");
+    expect(response.body[0]).toEqual({
+        row: 11,
+        col: 11
     });
+
+    expect(response.body[0]).not.toHaveProperty("room");
+    expect(response.body[0]).not.toHaveProperty("guestName");
 });
 
 });
